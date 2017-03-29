@@ -5,15 +5,18 @@ import (
 	"os"
 
 	"github.com/go-kit/kit/log"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Build time vars
 var (
-	Name      = "prom-sql-exporter"
-	Version   string
-	BuildTime string
-	Commit    string
+	Name        = "prom-sql-exporter"
+	Version     string
+	BuildTime   string
+	Commit      string
+	cfg         File
+	httpTrigger chan bool // Global trigger for sync http actions
+	httpDone    chan bool // Global done to signal back to http handler
+
 )
 
 func main() {
@@ -47,8 +50,14 @@ func main() {
 		go job.Run()
 	}
 
-	// setup and start webserver
-	http.Handle("/metrics", promhttp.Handler())
+	// create needed channels
+	httpTrigger = make(chan bool)
+	httpDone = make(chan bool)
+
+	// start handler for synchonus http actions
+	go syncHandler(httpTrigger, httpDone, &cfg)
+
+	http.HandleFunc("/metrics", handlerFunc)
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) { http.Error(w, "OK", http.StatusOK) })
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>

@@ -27,6 +27,18 @@ func (j *Job) Run() {
 	if j.log == nil {
 		j.log = log.NewNopLogger()
 	}
+
+	// if the interval is not set > 0, create needed channels
+	if j.Interval <= 0 {
+		if j.Trigger == nil {
+			j.Trigger = make(chan bool)
+		}
+
+		if j.Done == nil {
+			j.Done = make(chan bool)
+		}
+	}
+
 	// if there are no connection URLs for this job it can't be run
 	if j.Connections == nil {
 		return
@@ -93,13 +105,30 @@ func (j *Job) Run() {
 	// enter the run loop
 	// tries to run each query on each connection at approx the interval
 	for {
-		bo := backoff.NewExponentialBackOff()
-		bo.MaxElapsedTime = j.Interval
-		if err := backoff.Retry(j.runOnce, bo); err != nil {
-			j.log.Log("level", "error", "msg", "Failed to run", "err", err)
+		// if the interval is 0, wait to be triggered
+		if j.Interval <= 0 {
+			j.log.Log("level", "debug", "msg", "Wait for trigger, ", j.Name)
+			// wait for trigger
+			<-j.Trigger
+
+			if err := j.runOnce(); err != nil {
+				j.log.Log("level", "error", "msg", "Failed to run", "err", err)
+			}
+
+			// send to done chanel
+			j.Done <- true
+		} else {
+			// interval is grater than 0 so procide with async operation
+			bo := backoff.NewExponentialBackOff()
+			bo.MaxElapsedTime = j.Interval
+
+			if err := backoff.Retry(j.runOnce, bo); err != nil {
+				j.log.Log("level", "error", "msg", "Failed to run", "err", err)
+			}
+
+			j.log.Log("level", "debug", "msg", "Sleeping until next run", "sleep", j.Interval.String())
+			time.Sleep(j.Interval)
 		}
-		j.log.Log("level", "debug", "msg", "Sleeping until next run", "sleep", j.Interval.String())
-		time.Sleep(j.Interval)
 	}
 }
 
