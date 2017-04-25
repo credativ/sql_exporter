@@ -19,7 +19,6 @@ var (
 	Version   string
 	BuildTime string
 	Commit    string
-	cfg       File
 )
 
 func init() {
@@ -71,7 +70,7 @@ func main() {
 	prometheus.MustRegister(exporter)
 
 	// setup and start webserver with custom function
-	http.HandleFunc(*metricsPath, cfg.handlerFunc)
+	http.HandleFunc(*metricsPath, exporter.handlerFunc)
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) { http.Error(w, "OK", http.StatusOK) })
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
