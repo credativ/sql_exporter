@@ -1,5 +1,7 @@
-Prometheus SQL Exporter
-=======================
+# Prometheus SQL Exporter [![Build Status](https://travis-ci.org/justwatchcom/sql_exporter.svg?branch=master)](https://travis-ci.org/justwatchcom/sql_exporter)
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/justwatch/sql_exporter.svg?maxAge=604800)](https://hub.docker.com/r/justwatchcom/sql_exporter)
+[![Go Report Card](https://goreportcard.com/badge/github.com/justwatchcom/sql_exporter)](https://goreportcard.com/report/github.com/justwatchcom/sql_exporter)
 
 This repository contains an service that runs user-defined SQL queries at flexible intervals and exports the resulting metrics via HTTP for Prometheus consumption.
 
@@ -27,7 +29,7 @@ cp config.yml.dist config.yml
 Running in Docker:
 
 ```
-docker run -v `pwd`/config.yml:/config/config.yml -e CONFIG=/config/config.yml -d -p 8080:8080 --name sql_exporter justwatchcom/sql_exporter
+docker run -v `pwd`/config.yml:/config/config.yml -e CONFIG=/config/config.yml -d -p 9237:9237 --name sql_exporter justwatchcom/sql_exporter
 ```
 
 Manual `scrape_configs` snippet:
@@ -36,7 +38,7 @@ Manual `scrape_configs` snippet:
 scrape_configs:
 - job_name: sql_exporter
   static_configs:
-  - targets: ['localhost:8080']
+  - targets: ['localhost:9237']
 ```
 
 Flags
@@ -161,6 +163,16 @@ AS
 
 GRANT SELECT ON postgres_exporter.pg_stat_replication TO postgres_exporter;
 GRANT SELECT ON postgres_exporter.pg_stat_activity TO postgres_exporter;
+```
+
+Logging
+-------
+
+You can change the loglevel by setting the `LOGLEVEL` variable in the exporters
+environment.
+
+```
+LOGLEVEL=info ./sql_exporter
 ```
 
 Why this exporter exists

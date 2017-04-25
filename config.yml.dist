@@ -106,16 +106,13 @@ jobs:
             , idx_blks_read::float
             , idx_blks_hit::float
             FROM pg_statio_user_tables;
-- name: "synchronous-queries"
-  interval: '0s' # an interval <= 0 will make the queries synchronous
-  connections:
-  - 'postgres://postgres@localhost/postgres?sslmode=disable'
-  queries:
-  - name: "txid_current"
-    help: "Current xid, is queried synchronous"
-    labels:
-      - "xid"
-    values:
-      - "txid_current"
-    query:  |
-            SELECT txid_current()::float;
+queries:
+  pg_statio_user_tables:    |
+                            SELECT
+                              schemaname::text
+                            , relname::text
+                            , heap_blks_read::float
+                            , heap_blks_hit::float
+                            , idx_blks_read::float
+                            , idx_blks_hit::float
+                            FROM pg_statio_user_tables;

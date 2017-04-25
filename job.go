@@ -10,6 +10,7 @@ import (
 	"github.com/cenkalti/backoff"
 	_ "github.com/denisenkom/go-mssqldb" // register the MS-SQL driver
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	_ "github.com/go-sql-driver/mysql" // register the MySQL driver
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // register the PostgreSQL driver
@@ -21,6 +22,50 @@ var (
 	// characters, see github.com/prometheus/common/model.MetricNameRE
 	MetricNameRE = regexp.MustCompile("[^a-zA-Z0-9_:]+")
 )
+
+// Init will initialize the metric descriptors
+func (j *Job) Init(logger log.Logger, queries map[string]string) error {
+	j.log = log.With(logger, "job", j.Name)
+	// register each query as an metric
+	for _, q := range j.Queries {
+		if q == nil {
+			level.Warn(j.log).Log("msg", "Skipping invalid query")
+			continue
+		}
+		q.log = log.With(j.log, "query", q.Name)
+		if q.Query == "" && q.QueryRef != "" {
+			if qry, found := queries[q.QueryRef]; found {
+				q.Query = qry
+			}
+		}
+		if q.Query == "" {
+			level.Warn(q.log).Log("msg", "Skipping empty query")
+			continue
+		}
+		if q.metrics == nil {
+			// we have no way of knowing how many metrics will be returned by the
+			// queries, so we just assume that each query returns at least one metric.
+			// after the each round of collection this will be resized as necessary.
+			q.metrics = make(map[*connection][]prometheus.Metric, len(j.Queries))
+		}
+		// try to satisfy prometheus naming restrictions
+		name := MetricNameRE.ReplaceAllString("sql_"+q.Name, "")
+		help := q.Help
+		// prepare a new metrics descriptor
+		//
+		// the tricky part here is that the *order* of labels has to match the
+		// order of label values supplied to NewConstMetric later
+		q.desc = prometheus.NewDesc(
+			name,
+			help,
+			append(q.Labels, "driver", "host", "database", "user", "col"),
+			prometheus.Labels{
+				"sql_job": j.Name,
+			},
+		)
+	}
+	return nil
+}
 
 // Run prepares and runs the job
 func (j *Job) Run() {
@@ -41,6 +86,7 @@ func (j *Job) Run() {
 
 	// if there are no connection URLs for this job it can't be run
 	if j.Connections == nil {
+		level.Error(j.log).Log("msg", "No conenctions for job", "job", j.Name)
 		return
 	}
 	// make space for the connection objects
@@ -52,7 +98,7 @@ func (j *Job) Run() {
 		for _, conn := range j.Connections {
 			u, err := url.Parse(conn)
 			if err != nil {
-				j.log.Log("level", "error", "msg", "Failed to parse URL", "url", conn, "err", err)
+				level.Error(j.log).Log("msg", "Failed to parse URL", "url", conn, "err", err)
 				continue
 			}
 			user := ""
@@ -71,41 +117,12 @@ func (j *Job) Run() {
 			})
 		}
 	}
-	j.log.Log("level", "debug", "msg", "Starting")
-
-	// register each query as an metric
-	for _, q := range j.Queries {
-		if q == nil {
-			j.log.Log("level", "warning", "msg", "Skipping invalid query")
-			continue
-		}
-		// try to satisfy prometheus naming restrictions
-		name := MetricNameRE.ReplaceAllString("sql_"+q.Name, "")
-		help := q.Help
-		q.log = log.NewContext(j.log).With("query", q.Name)
-		p := prometheus.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Name: name,
-				Help: help,
-				ConstLabels: prometheus.Labels{
-					"sql_job": j.Name,
-				},
-			},
-			append(q.Labels, "driver", "host", "database", "user", "col"),
-		)
-		// this may fail due to a number of restrictions the default registry places
-		// on the metrics registered
-		if err := prometheus.Register(p); err != nil {
-			j.log.Log("level", "error", "msg", "Failed to register collector", "err", err)
-			continue
-		}
-		q.prom = p
-	}
+	level.Debug(j.log).Log("msg", "Starting")
 
 	// enter the run loop
 	// tries to run each query on each connection at approx the interval
 	for {
-		// if the interval is 0, wait to be triggered
+		// if the interval is 0 or lower, wait to be triggered
 		if j.Interval <= 0 {
 			j.log.Log("level", "debug", "msg", "Wait for trigger")
 			// wait for trigger
@@ -122,45 +139,61 @@ func (j *Job) Run() {
 			// interval is grater than 0 so procide with async operation
 			bo := backoff.NewExponentialBackOff()
 			bo.MaxElapsedTime = j.Interval
-
 			if err := backoff.Retry(j.runOnce, bo); err != nil {
-				j.log.Log("level", "error", "msg", "Failed to run", "err", err)
+				level.Error(j.log).Log("msg", "Failed to run", "err", err)
 			}
-
-			j.log.Log("level", "debug", "msg", "Sleeping until next run", "sleep", j.Interval.String())
+			level.Debug(j.log).Log("msg", "Sleeping until next run", "sleep", j.Interval.String())
 			time.Sleep(j.Interval)
 		}
 	}
 }
 
-func (j *Job) runOnce() error {
+func (j *Job) runOnceConnection(conn *connection, done chan int) {
 	updated := 0
-	// execute queries for each connection in order
-	for _, conn := range j.conns {
-		// connect to DB if not connected already
-		if err := conn.connect(j.Interval); err != nil {
-			j.log.Log("level", "warn", "msg", "Failed to connect", "err", err)
+	defer func() {
+		done <- updated
+	}()
+
+	// connect to DB if not connected already
+	if err := conn.connect(j.Interval); err != nil {
+		level.Warn(j.log).Log("msg", "Failed to connect", "err", err)
+		return
+	}
+
+	for _, q := range j.Queries {
+		if q == nil {
 			continue
 		}
-		for _, q := range j.Queries {
-			if q == nil {
-				continue
-			}
-			if q.prom == nil {
-				// this may happen if the metric registration failed
-				q.log.Log("level", "warning", "msg", "Skipping query. Collector is nil")
-				continue
-			}
-			q.log.Log("level", "debug", "msg", "Running Query")
-			// execute the query on the connection
-			if err := q.Run(conn); err != nil {
-				q.log.Log("level", "warning", "msg", "Failed to run query", "err", err)
-				continue
-			}
-			q.log.Log("level", "debug", "msg", "Query finished")
-			updated++
+		if q.desc == nil {
+			// this may happen if the metric registration failed
+			level.Warn(q.log).Log("msg", "Skipping query. Collector is nil")
+			continue
 		}
+		level.Debug(q.log).Log("msg", "Running Query")
+		// execute the query on the connection
+		if err := q.Run(conn); err != nil {
+			level.Warn(q.log).Log("msg", "Failed to run query", "err", err)
+			continue
+		}
+		level.Debug(q.log).Log("msg", "Query finished")
+		updated++
 	}
+}
+
+func (j *Job) runOnce() error {
+	doneChan := make(chan int, len(j.conns))
+
+	// execute queries for each connection in parallel
+	for _, conn := range j.conns {
+		go j.runOnceConnection(conn, doneChan)
+	}
+
+	// connections now run in parallel, wait for and collect results
+	updated := 0
+	for range j.conns {
+		updated += <-doneChan
+	}
+
 	if updated < 1 {
 		return fmt.Errorf("zero queries ran")
 	}

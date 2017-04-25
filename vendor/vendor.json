@@ -23,11 +23,16 @@
 			"revisionTime": "2017-03-07T17:24:21Z"
 		},
 		{
-			"checksumSHA1": "yZX1JnkLqTWcbc6ogOlAWK7/Xro=",
-			"origin": "jus.tw.cx/jw-prom-sql-exporter/vendor/github.com/go-kit/kit/log",
+			"checksumSHA1": "Y1zpEnbSvlhLozUt6U63CvC3PNw=",
 			"path": "github.com/go-kit/kit/log",
-			"revision": "d72332c7d02d462ca2d309e5682164314d441ec3",
-			"revisionTime": "2017-03-01T22:05:10Z"
+			"revision": "5d93a23737003ed3ad90359f0aeb25e08dfdf547",
+			"revisionTime": "2017-03-24T23:12:18Z"
+		},
+		{
+			"checksumSHA1": "kYhdJ/8zWpaicIyiPTLcRhuX8iY=",
+			"path": "github.com/go-kit/kit/log/level",
+			"revision": "5d93a23737003ed3ad90359f0aeb25e08dfdf547",
+			"revisionTime": "2017-03-24T23:12:18Z"
 		},
 		{
 			"checksumSHA1": "KxX/Drph+byPXBFIXaCZaCOAnrU=",
@@ -137,6 +142,12 @@
 			"checksumSHA1": "0LL9u9tfv1KPBjNEiMDP6q7lpog=",
 			"origin": "jus.tw.cx/jw-prom-sql-exporter/vendor/github.com/prometheus/common/model",
 			"path": "github.com/prometheus/common/model",
+			"revision": "49fee292b27bfff7f354ee0f64e1bc4850462edf",
+			"revisionTime": "2017-02-20T10:38:46Z"
+		},
+		{
+			"checksumSHA1": "91KYK0SpvkaMJJA2+BcxbVnyRO0=",
+			"path": "github.com/prometheus/common/version",
 			"revision": "49fee292b27bfff7f354ee0f64e1bc4850462edf",
 			"revisionTime": "2017-02-20T10:38:46Z"
 		},
