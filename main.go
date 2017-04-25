@@ -13,14 +13,6 @@ import (
 	"github.com/prometheus/common/version"
 )
 
-// Build time vars
-var (
-	Name      = "prom-sql-exporter"
-	Version   string
-	BuildTime string
-	Commit    string
-)
-
 func init() {
 	prometheus.MustRegister(version.NewCollector("sql_exporter"))
 }

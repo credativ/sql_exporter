@@ -9,7 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// handlerFunc can be used as handler for	http.HandleFunc()
+// handlerFunc can be used as handler for http.HandleFunc()
 // all synchronus jobs will be triggered and waited for,
 // than the promhttp handler is executed
 func (ex *Exporter) handlerFunc(w http.ResponseWriter, req *http.Request) {
