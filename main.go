@@ -9,14 +9,11 @@ import (
 
 // Build time vars
 var (
-	Name        = "prom-sql-exporter"
-	Version     string
-	BuildTime   string
-	Commit      string
-	cfg         File
-	httpTrigger chan bool // Global trigger for sync http actions
-	httpDone    chan bool // Global done to signal back to http handler
-
+	Name      = "prom-sql-exporter"
+	Version   string
+	BuildTime string
+	Commit    string
+	cfg       File
 )
 
 func main() {
@@ -50,14 +47,8 @@ func main() {
 		go job.Run()
 	}
 
-	// create needed channels
-	httpTrigger = make(chan bool)
-	httpDone = make(chan bool)
-
-	// start handler for synchonus http actions
-	go syncHandler(httpTrigger, httpDone, &cfg)
-
-	http.HandleFunc("/metrics", handlerFunc)
+	// use custom function to handle /metrics
+	http.HandleFunc("/metrics", cfg.handlerFunc)
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) { http.Error(w, "OK", http.StatusOK) })
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>

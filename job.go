@@ -107,7 +107,7 @@ func (j *Job) Run() {
 	for {
 		// if the interval is 0, wait to be triggered
 		if j.Interval <= 0 {
-			j.log.Log("level", "debug", "msg", "Wait for trigger, ", j.Name)
+			j.log.Log("level", "debug", "msg", "Wait for trigger")
 			// wait for trigger
 			<-j.Trigger
 
@@ -117,6 +117,7 @@ func (j *Job) Run() {
 
 			// send to done chanel
 			j.Done <- true
+			j.log.Log("level", "debug", "msg", "Job finished")
 		} else {
 			// interval is grater than 0 so procide with async operation
 			bo := backoff.NewExponentialBackOff()
