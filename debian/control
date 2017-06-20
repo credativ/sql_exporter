@@ -1,0 +1,26 @@
+Source: prometheus-sql-exporter
+Section: database
+Priority: optional
+Maintainer: Debian PostgreSQL Maintainers <pkg-postgresql-public@lists.alioth.debian.org>
+Uploaders: Christoph Berg <christoph.berg@credativ.de>
+Build-Depends: debhelper (>= 10),
+ golang-github-cenkalti-backoff-dev,
+ golang-github-denisenkom-go-mssqldb-dev,
+ golang-github-go-sql-driver-mysql-dev,
+ golang-github-jmoiron-sqlx-dev,
+ golang-github-prometheus-common-dev,
+#golang-github-go-kit-kit,
+Standards-Version: 4.0.0
+Homepage: https://github.com/credativ/sql_exporter
+Vcs-Browser: https://github.com/credativ/sql_exporter
+Vcs-Git: https://github.com/credativ/sql_exporter.git
+
+Package: prometheus-sql-exporter
+Architecture: any
+Depends:
+ postgresql-common,
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: Flexible SQL Exporter for Prometheus
+ This Prometheus exporter extracts various metrics from PostgreSQL, MySQL, and
+ MSSQL databases. The metrics are configurable via a YAML file.

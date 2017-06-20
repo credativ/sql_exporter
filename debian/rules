@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+export GOPATH=$(CURDIR)/go:/usr/share/gocode
+
+%:
+	dh $@ --with=systemd
+
+override_dh_auto_build:
+	-go get # exit 1, but does its job
+	go build
+
+override_dh_auto_test:
+	go test
+
+override_dh_auto_install:
+	mkdir -p debian/prometheus-sql-exporter/usr/bin
+	install sql_exporter debian/prometheus-sql-exporter/usr/bin/prometheus-sql-exporter
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf go
