@@ -1,0 +1,5 @@
+dependencies:
+  pre:
+  override:
+  post:
+    - cp sql_exporter $CIRCLE_ARTIFACTS/
