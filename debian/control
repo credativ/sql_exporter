@@ -10,6 +10,8 @@ Build-Depends: debhelper (>= 10),
  golang-github-jmoiron-sqlx-dev,
  golang-github-prometheus-common-dev,
 #golang-github-go-kit-kit,
+ git,
+ ca-certificates,
 Standards-Version: 4.0.0
 Homepage: https://github.com/credativ/sql_exporter
 Vcs-Browser: https://github.com/credativ/sql_exporter
