@@ -1,6 +1,7 @@
 [Unit]
 Description=Prometheus exporter for sql metrics
 Documentation=https://github.com/credativ/sql_exporter
+ConditionPathExists=/etc/prometheus-sql-exporter.yml
 
 [Service]
 Restart=always
