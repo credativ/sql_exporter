@@ -1,3 +1,4 @@
 CONFIG=/etc/prometheus-sql-exporter.yml
 PGHOST=/var/run/postgresql
+PGAPPNAME=prometheus-sql-exporter
 LOGLEVEL=WARN
