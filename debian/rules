@@ -14,3 +14,11 @@ override_dh_auto_test:
 override_dh_auto_install:
 	mkdir -p debian/prometheus-sql-exporter/usr/bin
 	install sql_exporter debian/prometheus-sql-exporter/usr/bin/prometheus-sql-exporter
+
+override_dh_installman:
+	PATH=$(PATH):debian/prometheus-sql-exporter/usr/bin \
+	help2man --no-discard-stderr --no-info \
+		--name "SQL Exporter for Prometheus" \
+		--version-string=$(shell dpkg-parsechangelog -S Version) \
+		prometheus-sql-exporter > prometheus-sql-exporter.1
+	dh_installman
