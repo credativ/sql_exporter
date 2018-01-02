@@ -1,4 +1,4 @@
-prometheus-sql-exporter (0.2.0.1) UNRELEASED; urgency=medium
+prometheus-sql-exporter (0.2.0.ds-1) UNRELEASED; urgency=medium
 
   * Initial Release.
 
