@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-export GOPATH=$(CURDIR)/go:/usr/share/gocode
+export GOPATH=/usr/share/gocode
 
 %:
 	dh $@ --with=systemd

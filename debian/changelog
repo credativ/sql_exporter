@@ -1,5 +1,5 @@
-prometheus-sql-exporter (0.2.0.ds-1) UNRELEASED; urgency=medium
+prometheus-sql-exporter (0.2.0.ds-1) unstable; urgency=medium
 
   * Initial Release.
 
- -- Christoph Berg <christoph.berg@credativ.de>  Wed, 14 Jun 2017 13:45:35 +0200
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 02 Jan 2018 13:22:33 +0100
