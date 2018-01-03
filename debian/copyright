@@ -6,6 +6,12 @@ Files-Excluded: vendor
 Files: *
 Copyright: Copyright 2017 JustWatch GmbH
 License: MIT
+
+Files: debian/*
+Copyright: Copyright 2018 The Debian Project
+License: MIT
+
+License: MIT
  The MIT License (MIT)
  .
  Permission is hereby granted, free of charge, to any person obtaining a copy
