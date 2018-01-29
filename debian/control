@@ -2,8 +2,9 @@ Source: prometheus-sql-exporter
 Section: database
 Priority: optional
 Maintainer: Debian PostgreSQL Maintainers <pkg-postgresql-public@lists.alioth.debian.org>
-Uploaders: Christoph Berg <christoph.berg@credativ.de>
+Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>= 10),
+ golang-any | golang-go,
  golang-github-cenkalti-backoff-dev,
  golang-github-denisenkom-go-mssqldb-dev,
  golang-github-go-sql-driver-mysql-dev,

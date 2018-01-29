@@ -1,3 +1,9 @@
+prometheus-sql-exporter (0.2.0.ds-3) unstable; urgency=medium
+
+  * Build-Depend on golang-any | golang-go.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Mon, 29 Jan 2018 09:55:46 +0100
+
 prometheus-sql-exporter (0.2.0.ds-2) unstable; urgency=medium
 
   * Set compilation output filename explicitly.
