@@ -1,20 +1,15 @@
 #!/usr/bin/make -f
 
-export GOPATH=/usr/share/gocode
-
 %:
-	dh $@ --with=systemd
-
-override_dh_auto_build:
-	go build -v -o prometheus-sql-exporter
-
-override_dh_auto_test:
-	go test -v
+	dh $@ --with=systemd --with=golang --buildsystem=golang
 
 override_dh_auto_install:
+	mv obj-$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)/bin/sql_exporter \
+	obj-$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)/bin/prometheus-sql-exporter
+	dh_auto_install -- --no-source
 
 override_dh_installman:
-	PATH=$(PATH):debian/prometheus-sql-exporter/usr/bin \
+	PATH=$(PATH):obj-$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)/bin \
 	help2man --no-discard-stderr --no-info \
 		--name "SQL Exporter for Prometheus" \
 		--version-string=$(shell dpkg-parsechangelog -S Version) \

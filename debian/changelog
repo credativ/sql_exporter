@@ -1,3 +1,11 @@
+prometheus-sql-exporter (0.2.0.ds-4) UNRELEASED; urgency=medium
+
+  [ Michael Stapelberg ]
+  * Port to use dh-golang.
+  * Set Built-Using field. (Closes: #892116)
+
+ -- Christoph Berg <myon@debian.org>  Thu, 08 Mar 2018 20:06:42 +0100
+
 prometheus-sql-exporter (0.2.0.ds-3) unstable; urgency=medium
 
   * Build-Depend on golang-any | golang-go.

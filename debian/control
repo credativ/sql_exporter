@@ -12,8 +12,10 @@ Build-Depends: debhelper (>= 10),
  golang-github-prometheus-common-dev,
  golang-github-go-kit-kit-dev,
  help2man,
+ dh-golang,
 Standards-Version: 4.1.3
 Homepage: https://github.com/credativ/sql_exporter
+XS-Go-Import-Path: github.com/credativ/sql_exporter
 Vcs-Browser: https://github.com/credativ/sql_exporter
 Vcs-Git: https://github.com/credativ/sql_exporter.git
 
@@ -23,6 +25,7 @@ Depends:
  postgresql-common,
  ${shlibs:Depends},
  ${misc:Depends},
+Built-Using: ${misc:Built-Using}
 Description: Flexible SQL Exporter for Prometheus
  This Prometheus exporter extracts various metrics from PostgreSQL, MySQL, and
  MSSQL databases. The metrics are configurable via a YAML file.
