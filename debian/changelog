@@ -1,10 +1,13 @@
-prometheus-sql-exporter (0.2.0.ds-4) UNRELEASED; urgency=medium
+prometheus-sql-exporter (0.2.0.ds-4) unstable; urgency=medium
 
   [ Michael Stapelberg ]
   * Port to use dh-golang.
   * Set Built-Using field. (Closes: #892116)
 
- -- Christoph Berg <myon@debian.org>  Thu, 08 Mar 2018 20:06:42 +0100
+  [ Christoph Berg ]
+  * Remove debug logging from our synchronous-jobs patch.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 10 Apr 2018 13:34:56 +0200
 
 prometheus-sql-exporter (0.2.0.ds-3) unstable; urgency=medium
 
