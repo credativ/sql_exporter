@@ -1,0 +1,3 @@
+Depends: @, curl, postgresql, postgresql-server-dev-all, psmisc
+Tests: exporter
+Restrictions: allow-stderr

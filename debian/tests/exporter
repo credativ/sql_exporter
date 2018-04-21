@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -eux
+
+pg_virtualenv <<-'EOF'
+	set -eux
+
+	psql <<EOT
+	CREATE TABLE sql_exporter (l text, a int);
+	INSERT INTO sql_exporter (l, a) VALUES ('testlabel', 5432 / 2);
+	EOT
+
+	config=$(mktemp --tmpdir sql_exporter.XXXXXX)
+	trap "rm -f $config; killall prometheus-sql-exporter" 0 2 3 15
+
+	cat > $config <<EOT
+	jobs:
+	  - name: "example"
+	    interval: 0
+	    connections:
+	      - 'postgres://:$PGPORT/postgres?sslmode=disable'
+	    queries:
+	      - name: "test_table"
+	        help: "test query for autopkgtest"
+	        labels:
+	          - "l"
+	        values:
+	          - "a"
+	        query: "SELECT * FROM sql_exporter"
+	EOT
+	cat $config
+
+	unset PGSYSCONFDIR # exporter gets confused otherwise
+	prometheus-sql-exporter -config.file $config -web.listen-address localhost:9238 &
+	sleep 1
+
+	curl -f http://localhost:9238/metrics | grep 'testlabel.*2716'
+EOF
