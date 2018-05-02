@@ -407,6 +407,16 @@ func (j *Job) markFailed(conn *connection) {
 func (j *Job) Run() {
 	bo := backoff.NewExponentialBackOff()
 	bo.MaxElapsedTime = j.Interval
+	// if the interval is not set > 0, create needed channels
+	if j.Interval <= 0 {
+		if j.Trigger == nil {
+			j.Trigger = make(chan bool)
+		}
+
+		if j.Done == nil {
+			j.Done = make(chan bool)
+		}
+	}
 	if bo.MaxElapsedTime == 0 {
 		bo.MaxElapsedTime = time.Minute
 	}

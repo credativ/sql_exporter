@@ -99,8 +99,20 @@ func NewExporter(logger log.Logger, configFile string) (*Exporter, error) {
 			exp.cronScheduler.Schedule(job.CronSchedule.schedule, job)
 			level.Info(logger).Log("msg", "Scheduled CRON job", "name", job.Name, "cron_schedule", job.CronSchedule.definition)
 		} else {
-			go job.ExecutePeriodically()
-			level.Info(logger).Log("msg", "Started periodically execution of job", "name", job.Name, "interval", job.Interval)
+			// if the interval is 0 or lower, wait to be triggered
+			if job.Interval <= 0 {
+				// wait for trigger
+				<-job.Trigger
+				if err := job.runOnce(); err != nil {
+					level.Error(logger).Log("msg", "Failed to run", "err", err)
+				}
+
+				// send true into done channel
+				job.Done <- true
+			} else {
+				go job.ExecutePeriodically()
+				level.Info(logger).Log("msg", "Started periodically execution of job", "name", job.Name, "interval", job.Interval)
+			}
 		}
 	}
 	exp.cronScheduler.Start()
