@@ -132,10 +132,10 @@ func (j *Job) Run() {
 				level.Error(j.log).Log("msg", "Failed to run", "err", err)
 			}
 
-			// send to done chanel
+			// send true into done channel
 			j.Done <- true
 		} else {
-			// interval is grater than 0 so procide with async operation
+			// interval is grater than 0, so proceed with an async operation
 			bo := backoff.NewExponentialBackOff()
 			bo.MaxElapsedTime = j.Interval
 			if err := backoff.Retry(j.runOnce, bo); err != nil {
