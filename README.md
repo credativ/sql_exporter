@@ -180,6 +180,11 @@ environment.
 LOGLEVEL=info ./sql_exporter
 ```
 
+Additional documentation
+========================
+
+can be found in the doc directory.
+
 Why this exporter exists
 ========================
 
