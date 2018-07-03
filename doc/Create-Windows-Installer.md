@@ -41,7 +41,7 @@ This layout is based on drive D:\. Adopt this configuration or change the corres
 Path / File | Description
 ------------|------------
 d:\sql_exporter\sql_exporter.exe | binary of the exporter
-d:\sql_exporter\config.yml | example configuration
+d:\sql_exporter\config.yml | example configuration (take a look at examples/config/mssql_config.yml)
 d:\sql_exporter\source | place the source code of the used sql_exporter here
 d:\sql_exporter\supplementals\sql_exporter.nsi | NSIS script for create the Installer-EXE
 
