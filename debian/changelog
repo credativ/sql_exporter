@@ -1,8 +1,8 @@
-prometheus-sql-exporter (0.2.0.ds-5) UNRELEASED; urgency=medium
+prometheus-sql-exporter (0.2.0.ds-5) unstable; urgency=medium
 
   * Add install-time testsuite.
 
- -- Christoph Berg <myon@debian.org>  Sat, 21 Apr 2018 09:17:14 +0200
+ -- Christoph Berg <christoph.berg@credativ.de>  Wed, 31 Oct 2018 13:32:44 +0100
 
 prometheus-sql-exporter (0.2.0.ds-4) unstable; urgency=medium
 
