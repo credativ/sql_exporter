@@ -11,7 +11,7 @@ pg_virtualenv <<-'EOF'
 	EOT
 
 	config=$(mktemp --tmpdir sql_exporter.XXXXXX)
-	trap "pkill -f prometheus-sql-exporter; rm -f $config" 0 2 3 15
+	trap 'kill $pid || :; rm -f $config' 0 2 3 15
 
 	cat > $config <<EOT
 	jobs:
@@ -32,6 +32,7 @@ pg_virtualenv <<-'EOF'
 
 	unset PGSYSCONFDIR # exporter gets confused otherwise
 	prometheus-sql-exporter -config.file $config -web.listen-address localhost:9238 &
+	pid="$!"
 	sleep 1
 
 	curl -f http://localhost:9238/metrics | grep 'testlabel.*2716'
