@@ -1,6 +1,7 @@
 prometheus-sql-exporter (0.2.0.ds-7) UNRELEASED; urgency=medium
 
   * Drop unnecessary dh arguments: --with=systemd
+  * Update standards version to 4.5.0, no changes needed.
 
  -- Debian Janitor <janitor@jelmer.uk>  Tue, 05 May 2020 13:51:49 +0000
 

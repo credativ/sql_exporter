@@ -13,7 +13,7 @@ Build-Depends: debhelper (>= 10),
  golang-github-go-kit-kit-dev,
  help2man,
  dh-golang,
-Standards-Version: 4.3.0
+Standards-Version: 4.5.0
 Homepage: https://github.com/credativ/sql_exporter
 XS-Go-Import-Path: github.com/credativ/sql_exporter
 Vcs-Browser: https://github.com/credativ/sql_exporter
