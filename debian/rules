@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --with=systemd --with=golang --buildsystem=golang
+	dh $@ --with=golang --buildsystem=golang
 
 override_dh_auto_install:
 	mv obj-$(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)/bin/sql_exporter \
